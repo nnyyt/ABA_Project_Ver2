@@ -1,0 +1,181 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABA Graph</title>
+  <link rel="stylesheet" href="./assets/css/pyarg.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="nav-inner">
+      <a class="nav-link" href="./homepage.html">Home</a>
+      <a class="nav-link active" href="./review_category.html">Review</a>
+      <a class="nav-link" href="./aboutus.html">About Us</a>
+    </nav>
+  </header>
+
+  <div class="frame">
+    <header class="studio-head">
+      <div class="title-block">
+        <h1>ABA Graph Studio</h1>
+        <p id="graph-meta" class="meta-line" hidden style="display:none !important;">Loading...</p>
+      </div>
+      <div class="head-actions">
+        <a id="back-link" class="btn-back" href="./review_category.html">Back</a>
+        <button id="toggle-all-btn" class="btn-toggle" type="button" hidden>Show All</button>
+      </div>
+    </header>
+
+    <section class="summary-grid" hidden>
+      <article class="summary-card"><span>Topic</span><strong id="stat-topic">-</strong></article>
+      <article class="summary-card"><span>Sentiment</span><strong id="stat-sentiment">-</strong></article>
+      <article class="summary-card"><span>Claim</span><strong id="stat-claim">-</strong></article>
+      <article class="summary-card"><span>Supporting</span><strong id="stat-supporting">-</strong></article>
+      <article class="summary-card"><span>Attacks</span><strong id="stat-attacks">0</strong></article>
+      <article class="summary-card"><span>Semantics</span><strong id="stat-semantics">Preferred</strong></article>
+    </section>
+
+    <section class="studio-main">
+      <section id="graph-section" class="workspace-grid" aria-label="ABA graph workspace">
+        <section class="graph-card graph-workspace-panel">
+          <div class="card-head graph-head">
+            <h2 id="semantics-title">Main Graph (Preferred)</h2>
+          </div>
+          <section class="graph-panel workspace-canvas">
+            <svg id="main-graph-canvas" viewBox="0 0 1280 540" role="img" aria-label="Main preferred graph"></svg>
+          </section>
+        </section>
+
+        <aside class="sidebar-stack" aria-label="Graph controls and insights">
+          <section class="sidebar-card">
+            <h3>Graph Summary</h3>
+            <p class="sidebar-hint">High-level explanation of the visible graph for non-technical users</p>
+            <div id="graph-summary-text" class="natural-language-box">-</div>
+            <small id="graph-summary-meta" class="natural-language-meta"></small>
+          </section>
+
+          <article class="mini-guide-card step-guide">
+            <details open>
+              <summary>Graph Definition</summary>
+              <ol>
+                <li><strong>Top Node - Main Opinion:</strong> Read the gray top node first (<code>good_claim</code> or <code>bad_claim</code>). This represents the Main Opinion of the selected category and the final conclusion being evaluated in the graph.</li>
+                <li><strong>Middle Layer - Supporting Reasons / Opposing Views:</strong> The middle layer contains the key reasons connected to the Main Opinion. Green nodes represent supporting reasons, while red nodes represent opposing views that challenge the reasoning path through attack lines. A dashed border indicates an assumption that is not directly evidenced at that layer but is still part of the reasoning structure.</li>
+                <li><strong>Bottom Layer - Review Evidence:</strong> The bottom layer usually contains real customer review phrases. These phrases provide the evidence that supports higher-level reasons or, in some cases, act as opposing assumptions that challenge them.</li>
+                <li><strong>Arrows and Colors:</strong> Follow the arrow direction to understand the flow of influence. Black lines indicate support or connection, while red lines indicate attack or counterargument.</li>
+                <li><strong>Badge Number:</strong> The number shown on a node represents the amount of supporting evidence. A higher number means that point is mentioned in more reviews.</li>
+              </ol>
+            </details>
+          </article>
+
+          <article class="mini-guide-card">
+            <h3>Node types</h3>
+            <div class="legend-grid">
+              <div class="legend-item"><span class="legend-dot legend-main"></span><span>Main Opinion</span></div>
+              <div class="legend-item"><span class="legend-dot legend-support"></span><span>Supporting Reason</span></div>
+              <div class="legend-item"><span class="legend-dot legend-opposite"></span><span>Opposite View</span></div>
+              <div class="legend-item"><span class="legend-line"></span><span>Connection</span></div>
+              <div class="legend-item"><span class="legend-line-attack"></span><span>Red line = attack</span></div>
+              <div class="legend-item"><span class="legend-badge">1</span><span>Badge Number = evidence count on that node</span></div>
+              <div class="legend-item"><span class="legend-dash"></span><span>Border dashed = assumption</span></div>
+              <div class="legend-item"><span class="legend-solid"></span><span>Border solid = claim/reason</span></div>
+            </div>
+          </article>
+
+        </aside>
+      </section>
+
+      <section class="under-graph-cards" aria-label="Graph controls and insights">
+        <section class="sidebar-card">
+          <h3>Graph Controls</h3>
+          <div class="filter-row">
+            <label for="layer-mode-select">Layer View</label>
+            <select id="layer-mode-select">
+              <option value="layer1">Layer 1: A + B</option>
+              <option value="layer2" selected>Layer 2: Full graph</option>
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label for="semantics-select">Semantics</label>
+            <select id="semantics-select">
+              <option value="Stable">Stable</option>
+              <option value="Preferred" selected>Preferred</option>
+              <option value="Conflict-Free">Conflict-Free</option>
+              <option value="Naive">Naive</option>
+              <option value="Admissible">Admissible</option>
+              <option value="Complete">Complete</option>
+              <option value="SemiStable">SemiStable</option>
+              <option value="Grounded">Grounded</option>
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <label for="strategy-select">Evaluation Strategy</label>
+            <select id="strategy-select">
+              <option value="Credulous" selected>Credulous</option>
+              <option value="Skeptical">Skeptical</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Extension Sets</h3>
+          <p class="sidebar-hint">Semantic extension members. These are assumption sets, not final accepted claims.</p>
+          <div id="extension-list" class="token-wrap"></div>
+          <p class="sidebar-hint" style="margin-top:0.6rem;">Formal semantics explanation</p>
+          <div id="extension-natural-language" class="natural-language-box">-</div>
+          <small id="extension-natural-meta" class="natural-language-meta"></small>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Model Settings</h3>
+          <div class="filter-row">
+            <label for="llm-model-select">LLM Model</label>
+            <select id="llm-model-select">
+              <option value="gemma3:4b" selected>gemma3:4b</option>
+              <option value="deepseek-r1:7b">deepseek-r1:7b</option>
+              <option value="qwen2.5:7b">qwen2.5:7b</option>
+            </select>
+          </div>
+          <p class="sidebar-hint">Uses your local Ollama server only</p>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Accepted Assumptions</h3>
+          <p class="sidebar-hint">Credulous uses the union of extension sets; skeptical uses the intersection. The selected claim is accepted only if it is derived from these assumptions through the ABA rules.</p>
+          <div id="accepted-assumptions" class="token-wrap"></div>
+          <p class="sidebar-hint" style="margin-top:0.6rem;">Accepted assumptions explanation</p>
+          <div id="accepted-natural-language" class="natural-language-box">-</div>
+          <small id="accepted-natural-meta" class="natural-language-meta"></small>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>ABA Payload JSON</h3>
+          <p class="sidebar-hint">Exact payload currently sent to PyArg for the selected graph layer and semantics. Atoms prefixed with <code>__ctr__</code> are synthetic helper contraries added for ABA evaluation.</p>
+          <pre id="payload-json-output" class="payload-json-box">Loading payload...</pre>
+        </section>
+
+      </section>
+    </section>
+
+    <section class="semantics-wrap">
+      <details class="semantics-panel tech-panel" open>
+        <summary>Semantics Debug</summary>
+        <p id="preferred-meta">Loading semantics...</p>
+        <pre id="preferred-output"></pre>
+      </details>
+
+      <details class="json-panel tech-panel">
+        <summary>Graph JSON</summary>
+        <pre id="json-output"></pre>
+      </details>
+    </section>
+
+  </div>
+
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/graph.js"></script>
+  <script src="./assets/js/pyarg-page.js"></script>
+</body>
+</html>
