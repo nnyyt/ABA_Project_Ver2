@@ -932,23 +932,43 @@
     }
 
     const nodesToHide = new Set();
+
+    // Always hide defense-layer claim and assumptions in UI.
     if (defenseLayerClusterId) {
       for (const node of allNodes) {
         if (String(node?.clusterId || "") !== defenseLayerClusterId) continue;
+    
+        if (selectedLayerMode === "layer1") {
+          nodesToHide.add(node.id);
+          continue;
+        }
+    
         if (node?.type === "claim" || node?.type === "assumption") {
           nodesToHide.add(node.id);
         }
       }
     }
-
-    if (opposingClaimClusterId) {
+    
+    // For UI Layer 1, keep only the opposite propositions that attack selected-side assumptions.
+    if (selectedLayerMode === "layer1" && opposingClaimClusterId) {
+      for (const node of allNodes) {
+        if (String(node?.clusterId || "") !== opposingClaimClusterId) continue;
+    
+        if (node?.type === "claim" || node?.type === "assumption") {
+          nodesToHide.add(node.id);
+        }
+      }
+    } else if (opposingClaimClusterId) {
       let opposingClusterHasAttack = false;
       for (const edge of allEdges) {
         if (edge?.type !== "attack") continue;
         const srcNode = nodeById.get(edge.source);
         const tgtNode = nodeById.get(edge.target);
         if (!srcNode || !tgtNode) continue;
-        if (String(srcNode.clusterId || "") === opposingClaimClusterId || String(tgtNode.clusterId || "") === opposingClaimClusterId) {
+        if (
+          String(srcNode.clusterId || "") === opposingClaimClusterId ||
+          String(tgtNode.clusterId || "") === opposingClaimClusterId
+        ) {
           opposingClusterHasAttack = true;
           break;
         }
