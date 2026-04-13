@@ -141,6 +141,7 @@
       if (!activeTopic) return;
       const q = new URLSearchParams({
         topic: canonicalTopic(activeTopic),
+        selected_topic: String(activeTopic || ""),
         sentiment,
         supporting: String(r.proposition || ""),
         show_all_contrary: "1",
@@ -190,6 +191,14 @@
       loadData();
     });
   });
+
+  function findCardByTopicLabel(topicLabel) {
+    const wanted = canonicalTopic(topicLabel);
+    return Array.from(cards).find((card) => {
+      const cardTopic = canonicalTopic(card.dataset.topic || "");
+      return cardTopic === wanted;
+    }) || null;
+  }
 
   if (searchInput) searchInput.addEventListener("input", renderAllRows);
 
@@ -242,8 +251,24 @@
       console.error("loadTopicRatios error:", e);
     }
   }
-
-  setActiveCard(null);
-  showPanel(false);
-  loadTopicRatios();
+  
+  async function initializePage() {
+    setActiveCard(null);
+    showPanel(false);
+  
+    await loadTopicRatios();
+  
+    const initialTopic = String(params.get("topic") || "").trim();
+    if (!initialTopic) return;
+  
+    const targetCard = findCardByTopicLabel(initialTopic);
+    if (!targetCard) return;
+    if (targetCard.dataset.enabled !== "1") return;
+  
+    setActiveCard(targetCard);
+    showPanel(true);
+    await loadData();
+  }
+  
+  initializePage();
 })();

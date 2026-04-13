@@ -46,6 +46,7 @@
   const topic = String(params.get("topic") || "").trim();
   const sentiment = String(params.get("sentiment") || "all").trim();
   const supporting = String(params.get("supporting") || "").trim();
+  const selectedTopicLabel = String(params.get("selected_topic") || topic || "").trim();
   const attackMode = String(params.get("attack_mode") || "all").trim().toLowerCase();
   const attackDepth = String(params.get("attack_depth") || "1").trim();
   const focusOnly = String(params.get("focus_only") || "1").trim().toLowerCase();
@@ -117,7 +118,10 @@
     return;
   }
 
-  backLink.href = `./review_category.html?type=${encodeURIComponent(sentiment.toLowerCase())}`;
+  const backParams = new URLSearchParams();
+  backParams.set("type", String(sentiment || "").toLowerCase());
+  if (selectedTopicLabel) backParams.set("topic", selectedTopicLabel);
+  backLink.href = `./review_category.html?${backParams.toString()}`;
   metaEl.textContent = `topic=${topic}, sentiment=${sentiment}, supporting=${supporting}, layer_mode=${selectedLayerMode}, attack_mode=${attackMode}, attack_depth=${attackDepth}, focus_only=${focusOnly}`;
 
   function setToggleButton(meta) {
